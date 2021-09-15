@@ -1,35 +1,54 @@
-  def inference(args, ctx):
+import os, subprocess, logging
+import tensorflow as tf
+import numpy as np
+import pandas as pd
+from blueprint.modelUtils import get_model_config
 
-      import os
-      import subprocess
-      import logging
+def predict_udf(data, export_dir):
+	features, labels, weights, metadata = [], [], [], []
+	for item in data:
+		features.append(item[0])
+		labels.append(item[1])
+		weights.append(item[2])
+		metadata.append(item[3])
+	xs = np.array(features)
+	ys = np.array(labels)
+	ws = np.array(weights)
+	ms = np.array(metadata)
 
-      logger = logging.getLogger(__name__)
+	config = get_model_config()
 
-      import blueprint as bp
-      from blueprint import pred_fn
-      from distml.data_setup import dataset_fn
-      import tensorflow as tf
-      import pandas as pd
-      import numpy as np
+	# Load the saved model and predict
+	saved_model = tf.save_model.load(export_dir, tags='serve')
+	predict = saved_model.signatures['serving_default']
+	preds = predict(**{config['first_layer']:tf.convert_tensor(xs,np.float32)})
+	return np.concatenate((xs, ys, preds[config['final_layer']].numpy(), ms, ws), axis=1)
+	
+def inference(args, ctx):
 
-      pred_dataset_path = args["data_paths"]["pred_path"]
-      out_dir = args["data_paths"]["output_dir"]
-      tf.io.gfile.makedirs(output_dir)
+	logger = logging.getLogger(__name__)
+	
+	from distml.data_setup import dataset_fn
 
-      logger.info("Predicting using {bp.__ModelName__} Version: {bp.__version__}")
+	pred_dataset_path = args["data_paths"]["pred_path"]
+	output_dir = args["data_paths"]["output_dir"]
+	config = get_model_config()
+	tf.io.gfile.makedirs(output_dir)
 
-      # load saved_model
-      model_path = os.path.join(args["data_paths"]["export_dir"], str(args["model_parms"]["model_id"]))
-      saved_model = tf.saved_model.load(model_path, tags='serve')
-      predict = saved_model.signatures['serving_default']
+	logger.info("Predicting using {bp.__ModelName__} Version: {bp.__version__}")
 
-      pred_dataset = dataset_fn(pred_dataset_path, input_context=ctx, args=args["model_params"], repeat_op=false)
+	# path to  saved_model
+	model_path = os.path.join(args["data_paths"]["export_dir"], str(args["model_parms"]["model_id"]))
 
-      output_file = "{}/part-{:05d}.parquet".format(output_dir, ctx.worker_num)
-
-      df = pd.DataFrame()
-      for i,batch in enumerate(pred_dataset):
-          df =df.append(pred_fn(predict, batch))
-      df.columns = df.colums.astype(str)
-      df.to_parquet(output_file)
+	pred_dataset = dataset_fn(pred_dataset_path, input_context=ctx, args=args["model_params"], repeat_op=false)
+	
+	output_file = "{}/part-{:05d}.csv".format(output_dir, ctx.worker_num)
+	
+	out = pred_dataset.rdd\
+					  .map(lambda x: ([x[i] for i in config['x_cols']], [x[i] for i in config['y_cols']],
+									  [x[i] for i in [config['weight_col']]], [x[i] for in config['meta_data']])
+						  )\
+					  .mapPartitions(lambda rows: predict_udf(rows, model_path))
+	df = out.map(lambda x: x.tolist()).toDF(config['x_cols'] + config['y_cols'] + [config['y_col']+'_predicted'] + config['meta_data'] + config['weight_col']])
+	output_dir = args["data_paths"]["output_dir"]
+	df.write.mode("overwrite").format("csv").save(output_file)
