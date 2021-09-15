@@ -1,7 +1,7 @@
 runtime:
   app_name: distmlApp 
   print_time: True
-  master: yarn 
+  master: local
   library_paths:
     - /content/blueprint.zip 
     - /content/distml.zip
@@ -44,8 +44,8 @@ model_params:
           - True
           - False
     data_paths:
-      train_path: /sample_data/california_housing_train.csv 
-      eval_path: /sample_data/california_housing_test.csv 
-      pred_path: /sample_data/california_housing_test.csv
+      train_path: /content/drive/MyDrive/titanic/train.csv 
+      eval_path: /content/drive/MyDrive/titanic/test.csv 
+      pred_path: /content/drive/MyDrive/titanic/test.csv
       export_dir: /content/tf_regression_export
       output_dir: /content/tf_regression_output

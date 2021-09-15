@@ -42,7 +42,7 @@ def dml(args=[]):
 
         logger.info(f"Running function ... {cmd}")
 
-        args = configuration.from_file(args.config)
+        args = Configuration.from_file(args.config)
 
         if not args["runtime"].get('print_time', False):
             Timer.print_time = False
@@ -51,27 +51,27 @@ def dml(args=[]):
 
             spark = start_spark(args)
 
-            sc=spark.spark(args)
+            sc=spark.sparkContext
 
             for path in args["runtime"]["library_paths"]:
                 logger.info(f"Uploading zip file from {path}")
                 sc.addPyFile(path)
 
-            logger.info(f"Spark session started. Application Id: {sc.application}")
+            logger.info(f"Spark session started. Application Id: {sc.applicationId}")
             logger.info(f"Spark UI: {sc.uiWebUrl}")
 
         if cmd=="train_and_eval":
 
-            if args["model_parms"].get("train_cnt")==None or args["model_parms"].get("eval_cnt")==None:
-                args["model_parms"]["train_cnt"]=pd.read_csv(args["data_paths"]["train_path"]).count()
-                args["model_parms"]["eval_cnt"]=pd.read_csv(args["data_paths"]["eval_path"]).count()
+            if args["model_params"].get("train_cnt")==None or args["model_params"].get("eval_cnt")==None:
+                args["model_params"]["train_cnt"]=pd.read_csv(args["data_paths"]["train_path"]).count()
+                args["model_params"]["eval_cnt"]=pd.read_csv(args["data_paths"]["eval_path"]).count()
 
             logger.info(f'Train Data count : {args["model_params"]["train_cnt"]}. Validation Data Count : {args["model_params"]["eval_cnt"]}')
 
             logger.info("Starting to train the model on shared grid ...")
       
             cluster = TFCluster.run(sc,train_and_eval, args, args["runtime"]["spark_conf"]["spark.executor.instances"],num_ps=0,
-                                    tensorboard=args["model_parms"]["tensorboard"], log_dir=args["model_parms"]["log_dir"],
+                                    tensorboard=args["model_params"]["tensorboard"], log_dir=args["model_params"]["log_dir"],
                                   input_mode=TFCluster.InputMode.TENSORFLOW, master_node='chief')
             cluster.shutdown()
 
@@ -90,8 +90,6 @@ def dml(args=[]):
             logger.info("Completed the predictions.")
 
         elif cmd=="hparam_tuning":
-            
-
 
             param_grid = list(ParameterGrid({k:v["values"] for k,v in args["model_params"]["hpTuning"]["hparams"].items()}))
             args["model_params"]["hpTuning"]["hparams"] = param_grid
@@ -99,7 +97,7 @@ def dml(args=[]):
             # TFparallel.run(sc, inference, args, args.cluster_size)
             logger.info("Starting hyper-parameter tuning the model ...")
             cluster = TFCluster.run(sc, hparams_tuning, args, args["runtime"]["spark_conf"]["spark.executor.instances"],num_ps=0,
-                                    tensorboard=args["model_parms"]["tensorboard"], log_dir=args["model_parms"]["hparamslog_dir"],
+                                    tensorboard=args["model_params"]["tensorboard"], log_dir=args["model_params"]["hparamslog_dir"],
                                   input_mode=TFCluster.InputMode.TENSORFLOW, master_node='chief')
             
             cluster.shutdown()

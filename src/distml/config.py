@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class Configuration(dict):
 
-    def __init__(self, config, overides=None):
+    def __init__(self, config, overrides=None):
         config = self._apply_overrides(config, overrides)
         super().__init__(config)
 

@@ -26,7 +26,7 @@ class Timer():
   print_time = True
 
   def __init__(self,process_name="", logger=logging.getLogger()):
-      self.prosess_name = process_name
+      self.process_name = process_name
       self.logger = logger
 
   def __call__(self, func):
@@ -36,19 +36,19 @@ class Timer():
               start = datetime.datetime.now()
           value = func(*args, **kwargs)
           if Timer.print_time:
-            logger = logging.getLogger(func.__module)
+            logger = logging.getLogger(func.__module__)
             logger.info(
-                f"{self.process_name if len(self.process_name) > 0 else func.__name__} elapsed time: {datetime.now() - start}")
+                f"{self.process_name if len(self.process_name) > 0 else func.__name__} elapsed time: {datetime.datetime.now() - start}")
             return value
       return wrap
 
 def __enter__(self, ):
   if Timer.print_time:
-        self.start = datetime.now()
+        self.start = datetime.datetime.now()
   return self
 
 def __exit__(self,*args):
     if Timer.print_time:
         selff.logger.info(
-            f"{self.process_name + ' ' if len(self.process_name) > 0 else ''}elapsed time: {datetime.now() - selfstart}")
+            f"{self.process_name + ' ' if len(self.process_name) > 0 else ''}elapsed time: {datetime.datetime.now() - selfstart}")
         
