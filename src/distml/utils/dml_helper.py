@@ -57,7 +57,7 @@ def parse_cmd_options(args: List[str]):
     map
       keys-value paris of the command line options
     """
-    parser = argparse.Argumentparser()
+    parser = argparse.ArgumentParser()
     
     subparsers = parser.add_subparsers(
         help='commands'
