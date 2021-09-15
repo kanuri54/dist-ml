@@ -1,0 +1,69 @@
+runtime:
+  app_name: distmlApp 
+  print time: True
+  master: yarn 
+  library_paths:
+    - hdfs://cecldev/edl/appl/pyfrm/users/u775411/blueprint.zip 
+    - hdfs://cecldev/edl/appl/pyfrm/users/u775411/distal.zip
+  spark_conf:
+  #      spark.submit.deployMode: cluster
+    spark.executor.instances: 50 
+    spark.executor.cores: 1
+    spark.task.cpus: 1
+    spark.executor.memory: 20g
+    spark.driver.cores: 4 
+    spark.driver.nemory: 64g
+    spark.yarn.stagingDir: hdfs://cecldev/user/pfmdlexec
+    spark.executorEnv.LD_LIBRARY_PATH: /usr/hdp/3.1.5.0-152/hadoop/lib/native/:/usr/hdp/3.1.5.0-152/usr/lib/:/opt/mapr/hadoop/hadoop-2.7.0/lib/native/:/usr/openv/java/jre/lib/amd64/server/
+    spark.yarn.appflasterEnv.PYSPARK_PYTHON: /python-env/apps/pyfarm/conda_envs/envs/pyfarm_ml/bin/python 
+    spark.executorEnv.PYSPARK_PYTHON: /python-env/apps/pyfarm/conda_envs/envs/pyfarm_ml/bin/python 
+    spark.yarn.dist.archives: hdfs://cecidev/edl/appl/pyfrm/users/u775411/pyfarm_ml.zip#python-env 
+    spark.jars: hdfs://cecldev/edl/appl/pyfrm/users/u775411/spark-tensorflow-connector-2.11-1.15.0.jar 
+    spark.scheduler.minRegisteredResourcesRatio: 1.0
+    spark.scheduler.maxRegisteredResourcesWaitingTime: 86400s
+    spark.yarn.queue: edl-sit-pyfrm-q-ml
+
+model_params:
+  batch_size: 20000
+  buffer_size: 10000 
+  epochs:
+  train cnt: 66692716
+  eval cnt: 33307284
+  log_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tblogs/fit 
+  model_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tf_regression
+  tensorboard: True
+  tb_port: 3025 
+  model_id: 1611063835
+  hpTuning:
+    hparamLog_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tblogs/hparam_tuning
+    metrics:
+      mse:
+        name: MSE
+    hparams:
+      batch_size:
+        name: HP BATCH_SIZE
+        type: Discrete
+        values:
+          - 5000
+          - 10000
+          - 20000
+          - 40000
+      learning rate:
+        name: HP_LEARNING_RATE
+        type: Discrete
+        values:
+          - 0.1
+          - 0.01
+          - 0.001
+      reduceLR_op:
+        name: HP_REDUCELR_OP
+        type: Discrete
+        values:
+          - True
+          - False
+    data_paths:
+      train_path: hdfs://cecldev/edl/appl/pyfrm/users/u775411/sample_data/500/train 
+      eval_path: hdfs://cecidev/edl/appl/pyfrm/users/u775411/sample_data/500/valid
+      pred_path: hdfs://cecldev/edl/appl/pyfrm/users/u775411/sample_data/500MM/valid 
+      export_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tf_regression_export_2
+      output_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tf_regression_output
