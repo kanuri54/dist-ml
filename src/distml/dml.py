@@ -11,7 +11,7 @@
   from distl.hparam_tuning import hparam_tuning
   from distml.config import Configuration
   from distml.utils.spark_utils import start_spark
-  from distml.utils.dml_helper import run_cmd, parse_cmd_options, hdfsDelete
+  from distml.utils.dml_helper import run_cmd, parse_cmd_options
   from distml.utils.timer import Timer
   from distml.utils.tbTool import TensorboardSupervisor
 
@@ -68,9 +68,6 @@
 
              logger.info(f'Train Data count : {args["model_params"]["train_cnt"]}. Validation Data Count : {args["model_params"]["eval_cnt"]}')
 
-             hdfsDelete(args["data_paths"]["export_dir"])
-             hdfsDelete(args["model_params"]["log_dir"])
-
              logger.info("Starting to train the model on shared grid ...")
         
              cluster = TFCluster.run(sc,train_and_eval, args, args["runtime"]["spark_conf"]["spark.executor.instances"],num_ps=0,
@@ -82,8 +79,6 @@
 
           elif cmd=="inference":
              
-             hdfsDelete(args["data_paths"]["output_dir"])
-
              # Running single-node TF instances on each executor
              # TFParallel.run(sc, inference, args, args.cluster_size)
              logger.info("Starting model inferencing ...")
@@ -96,10 +91,7 @@
 
           elif cmd=="hpram_tuning":
               
-             hdfsDelete(args["model_params"]["log_dir"])
 
-             # clear hparamsLog_dir folder
-             hdfsDelete(args["model_params"]["hpTuning"]["hparamlog_dir"])
 
              param_grid = list(ParameterGrid({k:v["values"] for k,v in args["model_params"]["hpTuning"]["hparams"].items()}))
              args["model_params"]["hpTuning"]["hparams"] = param_grid
