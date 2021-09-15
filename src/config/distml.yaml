@@ -16,30 +16,20 @@ runtime:
     spark.jars: /content/spark-tensorflow-connector-2.11-1.15.0.jar 
 
 model_params:
-  batch_size: 20000
-  buffer_size: 10000 
-  epochs:
-  train cnt: 66692716
-  eval cnt: 33307284
-  log_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tblogs/fit 
-  model_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tf_regression
+  epochs: 10
+  train cnt: 
+  eval cnt: 
+  log_dir: /content/tblogs/fit 
+  model_dir: /content/tf_regression
   tensorboard: True
   tb_port: 3025 
   model_id: 1611063835
   hpTuning:
-    hparamLog_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tblogs/hparam_tuning
+    hparamLog_dir: /content/tblogs/hparam_tuning
     metrics:
       mse:
         name: MSE
     hparams:
-      batch_size:
-        name: HP BATCH_SIZE
-        type: Discrete
-        values:
-          - 5000
-          - 10000
-          - 20000
-          - 40000
       learning rate:
         name: HP_LEARNING_RATE
         type: Discrete
@@ -54,8 +44,8 @@ model_params:
           - True
           - False
     data_paths:
-      train_path: hdfs://cecldev/edl/appl/pyfrm/users/u775411/sample_data/500/train 
-      eval_path: hdfs://cecidev/edl/appl/pyfrm/users/u775411/sample_data/500/valid
-      pred_path: hdfs://cecldev/edl/appl/pyfrm/users/u775411/sample_data/500MM/valid 
-      export_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tf_regression_export_2
-      output_dir: hdfs://cecldev/edl/appl/pyfrm/users/u775411/tf_regression_output
+      train_path: /sample_data/california_housing_train.csv 
+      eval_path: /sample_data/california_housing_test.csv 
+      pred_path: /sample_data/california_housing_test.csv
+      export_dir: /content/tf_regression_export
+      output_dir: /content/tf_regression_output

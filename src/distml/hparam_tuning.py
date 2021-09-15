@@ -62,9 +62,6 @@ def hparam_tuning(args, ctx):
         try:
             BATCH_SIZE = hparams["HP_BATCH_SIZE"]
             EPOCHS = hparams["HP_EPOCHS"] if "HP_EPOCHS" in hparams else args["model_params"]["epochs"]
-            GLOBAL_BATCH_SIZE = BATCH_SIZE = NUM_WORKERS
-            steps_per_epoch = math.floor((int(args["model_params"]["train_cnt"])/GLOBAL_BATCH_SIZE)*0.9)
-            steps_per_epoch_valid = math.floor((int(args["model_params"]["eval_cnt"])/GLOBAL_BATCH_SIZE)*0.8)
             train_dataset = pd.read_csv(train_dataset_path)
             eval_dataset = pd.read_csv(eval_dataset_path)
             X_train = train[config['x_cols']]

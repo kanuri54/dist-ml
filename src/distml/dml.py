@@ -63,8 +63,8 @@ def dml(args=[]):
         if cmd=="train_and_eval":
 
             if args["model_parms"].get("train_cnt")==None or args["model_parms"].get("eval_cnt")==None:
-              args["model_parms"]["train_cnt"]=spark.read.format("tfrecords").option("recordType","Example").load(args["data_paths"]["train_path"]).count()
-              args["model_parms"]["eval_cnt"]=spark.read.format("tfrecords").option("recordType","Example").load(args["data_paths"]["eval_path"]).count()
+                args["model_parms"]["train_cnt"]=pd.read_csv(args["data_paths"]["train_path"]).count()
+                args["model_parms"]["eval_cnt"]=pd.read_csv(args["data_paths"]["eval_path"]).count()
 
             logger.info(f'Train Data count : {args["model_params"]["train_cnt"]}. Validation Data Count : {args["model_params"]["eval_cnt"]}')
 
