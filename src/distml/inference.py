@@ -37,7 +37,7 @@ def inference(args, ctx):
     logger.info("Predicting using {bp.__ModelName__} Version: {bp.__version__}")
 
     # path to  saved_model
-    model_path = os.path.join(args["data_paths"]["export_dir"], str(args["model_parms"]["model_id"]))
+    model_path = os.path.join(args["data_paths"]["export_dir"], str(args["model_params"]["model_id"]))
 
     pred_dataset = spark.read.csv(pred_dataset_path)
 

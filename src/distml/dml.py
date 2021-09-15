@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 import traceback
+import pandas as pd
 import tensorflow as tf
 from tensorflowonspark import TFCluster
 from sklearn.model_selection import ParameterGrid
@@ -63,8 +64,8 @@ def dml(args=[]):
         if cmd=="train_and_eval":
 
             if args["model_params"].get("train_cnt")==None or args["model_params"].get("eval_cnt")==None:
-                args["model_params"]["train_cnt"]=pd.read_csv(args["data_paths"]["train_path"]).count()
-                args["model_params"]["eval_cnt"]=pd.read_csv(args["data_paths"]["eval_path"]).count()
+                args["model_params"]["train_cnt"]=pd.read_csv(args["data_paths"]["train_path"]).size
+                args["model_params"]["eval_cnt"]=pd.read_csv(args["data_paths"]["eval_path"]).size
 
             logger.info(f'Train Data count : {args["model_params"]["train_cnt"]}. Validation Data Count : {args["model_params"]["eval_cnt"]}')
 
