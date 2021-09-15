@@ -3,7 +3,6 @@ import logging
 import argparse
 import subprocess
 from typing import List
-from pyarrow import hdfs
 
 logger = logging.getLogger("__name__")
 
@@ -17,28 +16,6 @@ def run_cmd(cmd):
     s_return = proc.returncode
     return s_return, s_output, s_err
 
-def hdfsClearDir(path):
-    try:
-        fs = hdfs.connect(os.environ['HDFS_NAMESPACE'])
-        if fs.exists(path):
-            logger.info(f"Atemping to clear items in the path : {path}")
-            for i in fs.ls(path):
-                fs.delete(i, recursive=True) 
-    except Excepation as e:
-        logger.error(f"Exception occured: {e}")
-    finally:
-        fs.close()
-
-def hdfsDelete(path):
-    try:
-        fs = hdfs.connect(os.environ['HDFS_NAMESPACE'])
-        if fs.exists(path):
-            logger.info(f"Attempting to delete the path : {path}")
-            fs.delete(path, recursive=True)
-    except Exception as e:
-        logger.info(f"Exception occured:{e}")
-    finally:
-        fs.close()
 def runTensorboard(args):
     return "run_tensorboard", args
 def hparamTuning(args):
