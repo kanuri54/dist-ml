@@ -45,10 +45,10 @@ def inference(args, ctx):
 	output_file = "{}/part-{:05d}.csv".format(output_dir, ctx.worker_num)
 	
 	out = pred_dataset.rdd\
-					  .map(lambda x: ([x[i] for i in config['x_cols']], [x[i] for i in config['y_cols']],
-									  [x[i] for i in [config['weight_col']]], [x[i] for in config['meta_data']])
-						  )\
-					  .mapPartitions(lambda rows: predict_udf(rows, model_path))
+			  .map(lambda x: ([x[i] for i in config['x_cols']], [x[i] for i in config['y_cols']],
+							  [x[i] for i in [config['weight_col']]], [x[i] for in config['meta_data']])
+				  )\
+			  .mapPartitions(lambda rows: predict_udf(rows, model_path))
 	df = out.map(lambda x: x.tolist()).toDF(config['x_cols'] + config['y_cols'] + [config['y_col']+'_predicted'] + config['meta_data'] + config['weight_col']])
 	output_dir = args["data_paths"]["output_dir"]
 	df.write.mode("overwrite").format("csv").save(output_file)
