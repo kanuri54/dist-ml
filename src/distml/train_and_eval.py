@@ -10,7 +10,6 @@ def train_and_eval(args, ctx):
 
     import blueprint as bp
     from blueprint import build_model, get_calbacks, get_model_config
-    from distml.data_setup import dataset_fn
     from tensorflow_estimator.python.estimator.export import export_lib
     from tensorflowonspark import compat
     import tensorflow as tf
@@ -33,36 +32,46 @@ def train_and_eval(args, ctx):
     tf.config.threading.set_inter_op_parallelism_threads(1)
     tf.config.threading.set_intra_op_parallelism_threads(1)
 
-    # instantiate distribution strategy
-    strategy = tf.distribute.experimental.MultiWorkerMirrorStrategy()
-
-    GLOBAL_BTCH_SIZE = args["model_params"]["batch_size"] = args["runtime"]["spark_conf"]["spark.executor.instances"]
+    config = get_model_config()
+    
     train_dataset_path =  args["data_paths"]["train_path"]
     eval_dataset_path =  args["data_paths"]["eval_path"]
 
     # generate train and eval datasets
-    train_dataset = dataset_fn(train_dataset_path, input_context=ctx, args=args["model_params"])
-    eval_dataset = dataset_fn(eval_dataset_path, input_context=ctx, args=args["model_params"])
+    train_dataset = pd.read_csv(train_dataset_path)
+    eval_dataset = pd.read_csv(eval_dataset_path)
 
+    X_train = train[config['x_cols']]
+    y_train = train[config['y_col']]
+    X_valid = valid[config['x_cols']]
+    y_valid = valid[config['y_col']]
+    
+    if config['weight_col']:
+        sample_weights_train = train[config['weight_col']]
+        sample_weights_valid = valid[config['weight_col']]
+        
     tf.io.gfile.makedirs(args["data_paths"]["export_dir"])
     export_dir = export_lib.get_timestamped_export_dir(args["data_paths"]["export_dir"])
 
     # get list of callbacks
     callbacks = get_callbacks(args["model_params"])
 
+    if ctx.num_workers == 1:
+        model = build_model()
+    else:
+        # instantiate distribution strategy
+        strategy = tf.distribute.experimental.MultiWorkerMirrorStrategy() 
+        
+        # model building and compilinig should happen within scope
+        with strategy.scope():
+            model.build_model()
+        
     # Note: if your part files have an uneven number of records, you may see an "out of Range" exception
     # at less than the expected number of steps_per_epoch, because the excutor with least amount of records will finish first.
 
-    steps_per_epoch = math.floor((int(rgs["model_params"]["train_cnt"])/(GLOBAL_BATCH_SIZE))*0.9)
-    steps_per_epoch_valid = math.floor((int(rgs["model_params"]["train_cnt"])/(GLOBAL_BATCH_SIZE))*0.8)
-
     try:
-        with strategy.scope():
-            model.build_model()
-
-        model_history=model.fit(x=train_dataset, epochs=args["model_params"]["epochs"], steps_per_epoch=steps_per_epoch,
-                                validation_data=eval_dataset,validation_steps=steps_per_epoch_valid,
-                                callbacks=callbacks)
+        model_history=model.fit(x=train_dataset, epochs=args["model_params"]["epochs"], validation_data=eval_dataset, callbacks=callbacks)
+        
     except:
         ex_type, value, traceback=sys.exc_info()[:3]
         logger.error(f"Exception Type {exctype}")
