@@ -28,8 +28,6 @@ def inference(args, ctx):
 
 	logger = logging.getLogger(__name__)
 	
-	from distml.data_setup import dataset_fn
-
 	pred_dataset_path = args["data_paths"]["pred_path"]
 	output_dir = args["data_paths"]["output_dir"]
 	config = get_model_config()
