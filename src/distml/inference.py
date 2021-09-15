@@ -40,7 +40,7 @@ def inference(args, ctx):
 	# path to  saved_model
 	model_path = os.path.join(args["data_paths"]["export_dir"], str(args["model_parms"]["model_id"]))
 
-	pred_dataset = dataset_fn(pred_dataset_path, input_context=ctx, args=args["model_params"], repeat_op=false)
+	pred_dataset = spark.read.csv(pred_dataset_path)
 	
 	output_file = "{}/part-{:05d}.csv".format(output_dir, ctx.worker_num)
 	
