@@ -70,7 +70,9 @@ def train_and_eval(args, ctx):
     # at less than the expected number of steps_per_epoch, because the excutor with least amount of records will finish first.
 
     try:
-        model_history=model.fit(x=train_dataset, epochs=args["model_params"]["epochs"], validation_data=eval_dataset, callbacks=callbacks)
+        model_history=model.fit(X_train, y_train, sample_weight = sample_weights_train,
+                                validation_data = (X_valid, y_valid, sample_weight_valid),
+                                epochs=args["model_params"]["epochs"], callbacks=callbacks, verbose=2)
         
     except:
         ex_type, value, traceback=sys.exc_info()[:3]
