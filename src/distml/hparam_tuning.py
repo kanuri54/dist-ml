@@ -9,9 +9,9 @@
 
       import blueprint as bp
       from blueprint import build_model,get_callbacks
-      from distml.data_setup import dataset_fn
       from tensorboard.plugins.hparams import api as hp
       from tensorflow.keras import backend as k
+      import pandas as pd
       import tensor as tf
       import datetime
       import getpass
@@ -65,8 +65,8 @@
               GLOBAL_BATCH_SIZE = BATCH_SIZE = NUM_WORKERS
               steps_per_epoch = math.floor((int(args["model_params"]["train_cnt"])/GLOBAL_BATCH_SIZE)*0.9)
               steps_per_epoch_valid = math.floor((int(args["model_params"]["eval_cnt"])/GLOBAL_BATCH_SIZE)*0.8)
-              train_dataset = dataset_fn(train_dataset_path, input_context=ctx, args=args["model_params"], hparams=hparams)
-              eval_dataset = dataset_fn(eval_dataset_path, input_context=ctx, args=args["model_params"], hparams=hparams)
+              train_dataset = pd.read_csv(train_dataset_path)
+              eval_dataset = pd.read_csv(eval_dataset_path)
               model_history=model.fit(x=train_datset, epochs=EPOCHS, steps_per_epoch=steps_per_epoch,
                                       validation_data=eval_dataset,validation_steps=steps_per_epoch_valid,
                                       callbacks=callbacks)
