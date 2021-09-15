@@ -3,8 +3,7 @@ runtime:
   print_time: True
   master: local
   library_paths:
-    - /content/blueprint.zip 
-    - /content/distml.zip
+    - C:\Users\91767\Downloads\blueprint.zip 
   spark_conf:
   #      spark.submit.deployMode: cluster
     spark.executor.instances: 2
@@ -13,19 +12,19 @@ runtime:
     spark.executor.memory: 20g
     spark.driver.cores: 4 
     spark.driver.nemory: 64g
-    spark.jars: /content/spark-tensorflow-connector_2.11-1.15.0.jar 
+    spark.jars: C:\Users\91767\Downloads\spark-tensorflow-connector_2.11-1.15.0.jar 
 
 model_params:
-  epochs: 10
+  epochs: 100
   train cnt: 
   eval cnt: 
-  log_dir: /content/tblogs/fit 
-  model_dir: /content/tf_regression
+  log_dir: C:\Users\91767\Downloads\tblogs\fit 
+  model_dir: C:\Users\91767\Downloads\tf_regression
   tensorboard: True
   tb_port: 3025 
   model_id: 1611063835
   hpTuning:
-    hparamLog_dir: /content/tblogs/hparam_tuning
+    hparamLog_dir: C:\Users\91767\Downloads\tblogs\hparam_tuning
     metrics:
       mse:
         name: MSE
@@ -44,8 +43,8 @@ model_params:
           - True
           - False
 data_paths:
-  train_path: /content/drive/MyDrive/titanic/train.csv 
-  eval_path: /content/drive/MyDrive/titanic/test.csv 
-  pred_path: /content/drive/MyDrive/titanic/test.csv
-  export_dir: /content/tf_regression_export
-  output_dir: /content/tf_regression_output
+  train_path: C:\Users\91767\Downloads\titanic\train.csv 
+  eval_path: C:\Users\91767\Downloads\titanic\train.csv 
+  pred_path: C:\Users\91767\Downloads\titanic\test.csv
+  export_dir: C:\Users\91767\Downloads\tf_regression_export
+  output_dir: C:\Users\91767\Downloads\tf_regression_output

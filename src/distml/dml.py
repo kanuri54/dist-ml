@@ -4,6 +4,7 @@ import sys
 import traceback
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
 from tensorflowonspark import TFCluster
 from sklearn.model_selection import ParameterGrid
 
@@ -71,11 +72,32 @@ def dml(args=[]):
 
             logger.info("Starting to train the model on shared grid ...")
       
-            cluster = TFCluster.run(sc,train_and_eval, args, args["runtime"]["spark_conf"]["spark.executor.instances"],num_ps=0,
-                                    tensorboard=args["model_params"]["tensorboard"], log_dir=args["model_params"]["log_dir"],
-                                  input_mode=TFCluster.InputMode.TENSORFLOW, master_node='chief')
-            cluster.shutdown()
+#            cluster = TFCluster.run(sc,train_and_eval, args, args["runtime"]["spark_conf"]["spark.executor.instances"],num_ps=0,
+#                                    tensorboard=args["model_params"]["tensorboard"], log_dir=args["model_params"]["log_dir"],
+#                                    input_mode=TFCluster.InputMode.TENSORFLOW, master_node='chief')
+#            cluster.shutdown()
 
+            history = train_and_eval(args, {'num_workers':1})
+            
+            # list all data in history
+            print(history.history.keys())
+            # summarize history for accuracy
+            plt.plot(history.history['mse'])
+            plt.plot(history.history['val_mse'])
+            plt.title('model mse')
+            plt.ylabel('mse')
+            plt.xlabel('epoch')
+            plt.legend(['train', 'test'], loc='upper left')
+            plt.show()
+            # summarize history for loss
+            plt.plot(history.history['loss'])
+            plt.plot(history.history['val_loss'])
+            plt.title('model loss')
+            plt.ylabel('loss')
+            plt.xlabel('epoch')
+            plt.legend(['train', 'test'], loc='upper left')
+            plt.show()
+            
             logger.info("Completed training the model.")
 
         elif cmd=="inference":
