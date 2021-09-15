@@ -15,14 +15,14 @@
       return port
 
   class tensorboardSupervisor:
-    def __init__(self, hdfs_log_dir):
+    def __init__(self, log_dir):
       self.tb_port = get_open_port()
-      self.hdfs_log_dir = hdfs_log_dir
+      self.log_dir = log_dir
     
     def run(self):
       tb_url = f"http://{socket.gethostname()}.wellsfargo.com:{self.tb_port}"
       logger.info(f"\nTensorBoard 2.1.1 at {tb_url} (Press CTRL+C to quit)")
-      os.sysytem(f'{sys.executable} -m tensorboard.main --logdir "{self.hdfs_log_dir}"'
+      os.sysytem(f'{sys.executable} -m tensorboard.main --logdir "{self.log_dir}"'
                 f'--host=0.0.0.0 --port={self.tb_port} >/dev/null 2>&1')
       return tb_url
     
