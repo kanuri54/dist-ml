@@ -41,17 +41,17 @@ def parse_cmd_options(args: List[str]):
     )
     trainEvalparser = subparsers.add_parser('train_and_eval', help='train and eval in dstributed fashion')
     trainEvalparser.add_argument("-c","--config", required=True, help="configuration file loction")
-    trainEvalparser.set_defalts(func=distTrainEval)
-    predparser = subparsers.add_parser('perdict', help='predict in distributed fashion')
+    trainEvalparser.set_defaults(func=distTrainEval)
+    predparser = subparsers.add_parser('predict', help='predict in distributed fashion')
     predparser.add_argument(
         "-c", "--config",required=True,help ="condiguration file location"
     )
-    predParser.set_defalts(func=distPredict)
+    predparser.set_defaults(func=distPredict)
     hpparser = subparsers.add_parser('hpTuning', help='run Hyper parameters tuning & view in tb dashboard ')
     hpparser.add_argument(
         "-c", "--config",required=True,help ="condiguration file location"
     )
-    hpparser.set_defalts(func=hparamTuning)
+    hpparser.set_defaults(func=hparamTuning)
     
     tbParser = subparsers.add_parser('tb', help='run tensorboard instance to visualize metrics or hparams')
       
@@ -59,6 +59,6 @@ def parse_cmd_options(args: List[str]):
         "-c", "--config",required=True,help ="condiguration file location"
     )
     
-    tbParser.setdefaults(func=runTensorboard)
+    tbParser.set_defaults(func=runTensorboard)
     
     return parser.parse_args(args)

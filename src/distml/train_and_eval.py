@@ -73,6 +73,8 @@ def train_and_eval(args, ctx):
         model_history=model.fit(X_train, y_train, sample_weight = sample_weights_train,
                                 validation_data = (X_valid, y_valid, sample_weight_valid),
                                 epochs=args["model_params"]["epochs"], callbacks=callbacks, verbose=2)
+        logger.info("========== exporting saved =_model to {}".format(export_dir))
+        compat.export_saved_model(model, export_dir, ctx.job_name == 'chief')
         
     except:
         ex_type, value, traceback=sys.exc_info()[:3]
@@ -80,6 +82,3 @@ def train_and_eval(args, ctx):
         logger.error(f"Exception value {value}")
         logger.error(f"Exception traceback {traceback}")
         raise
-
-Logger.info("========== exporting saved =_model to {}".format(export_dir))
-compat.export_saved_model(model, export_dir, ctx.job_name == 'chief')

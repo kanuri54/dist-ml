@@ -1,27 +1,19 @@
 runtime:
   app_name: distmlApp 
-  print time: True
+  print_time: True
   master: yarn 
   library_paths:
-    - hdfs://cecldev/edl/appl/pyfrm/users/u775411/blueprint.zip 
-    - hdfs://cecldev/edl/appl/pyfrm/users/u775411/distal.zip
+    - /content/blueprint.zip 
+    - /content/distml.zip
   spark_conf:
   #      spark.submit.deployMode: cluster
-    spark.executor.instances: 50 
+    spark.executor.instances: 1
     spark.executor.cores: 1
     spark.task.cpus: 1
     spark.executor.memory: 20g
     spark.driver.cores: 4 
     spark.driver.nemory: 64g
-    spark.yarn.stagingDir: hdfs://cecldev/user/pfmdlexec
-    spark.executorEnv.LD_LIBRARY_PATH: /usr/hdp/3.1.5.0-152/hadoop/lib/native/:/usr/hdp/3.1.5.0-152/usr/lib/:/opt/mapr/hadoop/hadoop-2.7.0/lib/native/:/usr/openv/java/jre/lib/amd64/server/
-    spark.yarn.appflasterEnv.PYSPARK_PYTHON: /python-env/apps/pyfarm/conda_envs/envs/pyfarm_ml/bin/python 
-    spark.executorEnv.PYSPARK_PYTHON: /python-env/apps/pyfarm/conda_envs/envs/pyfarm_ml/bin/python 
-    spark.yarn.dist.archives: hdfs://cecidev/edl/appl/pyfrm/users/u775411/pyfarm_ml.zip#python-env 
-    spark.jars: hdfs://cecldev/edl/appl/pyfrm/users/u775411/spark-tensorflow-connector-2.11-1.15.0.jar 
-    spark.scheduler.minRegisteredResourcesRatio: 1.0
-    spark.scheduler.maxRegisteredResourcesWaitingTime: 86400s
-    spark.yarn.queue: edl-sit-pyfrm-q-ml
+    spark.jars: /content/spark-tensorflow-connector-2.11-1.15.0.jar 
 
 model_params:
   batch_size: 20000
