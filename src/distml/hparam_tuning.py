@@ -67,10 +67,17 @@
               steps_per_epoch_valid = math.floor((int(args["model_params"]["eval_cnt"])/GLOBAL_BATCH_SIZE)*0.8)
               train_dataset = pd.read_csv(train_dataset_path)
               eval_dataset = pd.read_csv(eval_dataset_path)
-              model_history=model.fit(x=train_datset, epochs=EPOCHS, steps_per_epoch=steps_per_epoch,
-                                      validation_data=eval_dataset,validation_steps=steps_per_epoch_valid,
-                                      callbacks=callbacks)
-              #convertingg metrics to tf scalar
+              X_train = train[config['x_cols']]
+              y_train = train[config['y_col']]
+              X_valid = valid[config['x_cols']]
+              y_valid = valid[config['y_col']]
+
+              if config['weight_col']:
+                  sample_weights_train = train[config['weight_col']]
+                  sample_weights_valid = valid[config['weight_col']]
+                    
+              model_history=model.fit()
+              #converting metrics to tf scalar
               for m in hparam_metrics:
                   if m.as_proto().name.tag in model_history.history:
                       met = model_history.history[m.as_proto().name.tag][-1]
