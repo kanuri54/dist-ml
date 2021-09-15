@@ -76,7 +76,9 @@
                   sample_weights_train = train[config['weight_col']]
                   sample_weights_valid = valid[config['weight_col']]
                     
-              model_history=model.fit()
+              model_history=model.fit(X_train, y_train, sample_weight = sample_weights_train,
+                                      validation_data = (X_valid, y_valid, sample_weight_valid),
+                                      epochs=args["model_params"]["epochs"], callbacks=callbacks, verbose=2)
               #converting metrics to tf scalar
               for m in hparam_metrics:
                   if m.as_proto().name.tag in model_history.history:
